@@ -93,13 +93,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   );
 
   useEffect(() => {
-    const savedBestScore = localStorage.getItem("bestScore");
-
     initializeGame(gameState.gridSize);
-
-    if (savedBestScore) {
-      setBestScore(parseInt(savedBestScore, 10));
-    }
   }, []);
 
   useEffect(() => {
