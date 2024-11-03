@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { GameProvider } from "@/contexts/GameProvider";
+import dynamic from "next/dynamic";
+import { ReactNode } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -19,6 +20,17 @@ export const metadata: Metadata = {
   description: "This is 2048 Game",
 };
 
+type GameProviderProps = {
+  children: ReactNode;
+};
+
+const GameProviderNoSSR = dynamic<GameProviderProps>(
+  () => import("@/contexts/GameProvider").then((mod) => mod.GameProvider),
+  {
+    ssr: false,
+  },
+);
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,7 +41,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <GameProvider>{children}</GameProvider>
+        <GameProviderNoSSR>{children}</GameProviderNoSSR>
       </body>
     </html>
   );
