@@ -10,14 +10,17 @@ export type DirectionType = "up" | "down" | "left" | "right";
 
 export interface GameState {
   grid: Grid;
-  score: number;
-  bestScore: number;
   gridSize: number;
   hasWon: boolean;
   isDraw: boolean;
 }
 
-export interface GameContextType extends GameState {
+export type ScoreType = {
+  score: number;
+  bestScore: number;
+};
+
+export interface GameContextType extends GameState, ScoreType {
   setGridSize: (size: number) => void;
   initializeGame: () => void;
   moveLeft: () => void;
