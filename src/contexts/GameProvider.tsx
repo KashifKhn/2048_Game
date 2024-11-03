@@ -76,8 +76,6 @@ const mergeTiles = (
 
 const defaultState: GameState = {
   grid: createEmptyGrid(4),
-  score: 0,
-  bestScore: 0,
   gridSize: 4,
   hasWon: false,
   isDraw: false,
@@ -89,31 +87,31 @@ interface GameProviderProps {
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [gameState, setGameState] = useState<GameState>(defaultState);
+  const [score, setScore] = useState<number>(0);
+  const [bestScore, setBestScore] = useState<number>(
+    parseInt(localStorage.getItem("bestScore") || "0"),
+  );
 
   useEffect(() => {
-    const savedState = localStorage.getItem("gameState");
-    if (savedState) {
-      const parsedState = JSON.parse(savedState) as GameState;
-      setGameState({
-        ...parsedState,
-        grid: createEmptyGrid(parsedState.gridSize),
-      });
-      initializeGame(parsedState.gridSize);
-    } else {
-      initializeGame(gameState.gridSize);
+    const savedBestScore = localStorage.getItem("bestScore");
+
+    initializeGame(gameState.gridSize);
+
+    if (savedBestScore) {
+      setBestScore(parseInt(savedBestScore, 10));
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("gameState", JSON.stringify(gameState));
-  }, [gameState]);
+    localStorage.setItem("bestScore", bestScore.toString());
+  }, [bestScore]);
 
-  const updateScore = (score: number) => {
-    setGameState((prevState) => ({
-      ...prevState,
-      score: prevState.score + score,
-      bestScore: Math.max(prevState.score + score, prevState.bestScore),
-    }));
+  const updateScore = (points: number) => {
+    setScore((prevScore) => {
+      const newScore = prevScore + points;
+      setBestScore((prevBestScore) => Math.max(prevBestScore, newScore));
+      return newScore;
+    });
   };
 
   const setGridSize = useCallback((size: number) => {
@@ -178,6 +176,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const value: GameContextType = {
     ...gameState,
+    score,
+    bestScore,
     setGridSize,
     initializeGame: useCallback(
       () => initializeGame(gameState.gridSize),
